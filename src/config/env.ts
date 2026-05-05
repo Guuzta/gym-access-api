@@ -1,12 +1,6 @@
 import dotenv from "dotenv";
 
-const envFile = process.env.NODE_ENV;
-
-if (!envFile) {
-  throw new Error(
-    "NODE_ENV is not defined. Please set it in your script (e.g. development, test or production).",
-  );
-}
+const envFile = process.env.NODE_ENV || "development";
 
 dotenv.config({
   path: `.env.${envFile}`,
@@ -24,4 +18,5 @@ function getEnv(key: string): string {
 
 export const env = {
   PORT: Number(getEnv("PORT")),
+  DATABASE_URL: getEnv("DATABASE_URL"),
 };
