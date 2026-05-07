@@ -35,4 +35,4 @@ export const createClientSchema = z.object({
   }),
 });
 
-export type createClientBody = z.infer<typeof createClientSchema>;
+export type CreateClientBody = z.infer<typeof createClientSchema>;

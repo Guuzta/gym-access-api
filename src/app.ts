@@ -9,7 +9,7 @@ const app = express();
 
 app.use(express.json());
 app.use("/", healthRoutes);
-
+app.use("/admin", adminRoutes);
 
 app.use(errorHandler);
 
