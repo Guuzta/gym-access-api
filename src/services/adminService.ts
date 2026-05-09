@@ -74,8 +74,6 @@ const getAllClients = async (
     prisma.client.count({ where }),
   ]);
 
-  console.log(clients);
-
   return {
     data: clients,
     page,
