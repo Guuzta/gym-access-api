@@ -4,7 +4,11 @@ import * as adminService from "../services/adminService";
 
 import { CreateClientBody } from "../schemas/createClientSchema";
 
-import { CreatedClientResponse } from "../types/client";
+import {
+  CreatedClientResponse,
+  GetClientQuery,
+  GetAllClientsResponse,
+} from "../types/client";
 
 const createNewClient = async (
   req: Request<{}, {}, CreateClientBody>,
@@ -22,4 +26,26 @@ const createNewClient = async (
   }
 };
 
-export { createNewClient };
+const getAllClients = async (
+  req: Request<{}, {}, {}, GetClientQuery>,
+  res: Response<GetAllClientsResponse>,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const filters = {
+      firstName: req.query.firstName,
+      cpf: req.query.cpf,
+      isActive: req.query.isActive,
+      page: req.query.page,
+      limit: req.query.limit,
+    };
+
+    const clients = await adminService.getAllClients(filters);
+
+    res.status(200).json(clients);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { createNewClient, getAllClients };

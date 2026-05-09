@@ -1,9 +1,14 @@
+import type { Prisma } from "../generated/prisma/client";
 import { prisma } from "../lib/prisma";
 
 import AppError from "../utils/AppError";
 import generateUniqueAccessCode from "../utils/generateUniqueAccessCode";
 
-import { CreatedClientResponse } from "../types/client";
+import {
+  CreatedClientResponse,
+  GetClientQuery,
+  GetAllClientsResponse,
+} from "../types/client";
 
 const createNewClient = async (
   firstName: string,
@@ -35,4 +40,49 @@ const createNewClient = async (
   };
 };
 
-export { createNewClient };
+const getAllClients = async (
+  filters: GetClientQuery,
+): Promise<GetAllClientsResponse> => {
+  const { firstName, cpf, isActive } = filters;
+  const page = Number(filters.page) || 1;
+  const limit = Number(filters.limit) || 10;
+
+  const skip = (page - 1) * limit;
+
+  const where: Prisma.ClientWhereInput = {
+    ...(cpf && { cpf: cpf }),
+
+    ...(firstName && {
+      firstName: {
+        contains: firstName,
+        mode: "insensitive",
+      },
+    }),
+
+    ...(isActive !== undefined && {
+      isActive: isActive === "true",
+    }),
+  };
+
+  const [clients, total] = await Promise.all([
+    prisma.client.findMany({
+      where,
+      skip,
+      take: limit,
+    }),
+
+    prisma.client.count({ where }),
+  ]);
+
+  console.log(clients);
+
+  return {
+    data: clients,
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+  };
+};
+
+export { createNewClient, getAllClients };

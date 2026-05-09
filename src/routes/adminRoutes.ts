@@ -14,4 +14,9 @@ router.post(
   adminController.createNewClient,
 );
 
+router.get(
+  "/clients", 
+  adminController.getAllClients
+);
+
 export default router;
