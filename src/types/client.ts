@@ -31,3 +31,5 @@ export type GetAllClientsResponse = {
   total: number;
   totalPages: number;
 };
+
+export type GetClientByIdResponse = Client;

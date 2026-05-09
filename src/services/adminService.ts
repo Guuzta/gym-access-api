@@ -8,6 +8,7 @@ import {
   CreatedClientResponse,
   GetClientQuery,
   GetAllClientsResponse,
+  GetClientByIdResponse,
 } from "../types/client";
 
 const createNewClient = async (
@@ -83,4 +84,14 @@ const getAllClients = async (
   };
 };
 
-export { createNewClient, getAllClients };
+const getClientById = async (id: string): Promise<GetClientByIdResponse> => {
+  const client = await prisma.client.findUnique({ where: { id } });
+
+  if (!client) {
+    throw new AppError("Client not found", 404);
+  }
+
+  return client;
+};
+
+export { createNewClient, getAllClients, getClientById };

@@ -3,11 +3,13 @@ import { NextFunction, Request, Response } from "express";
 import * as adminService from "../services/adminService";
 
 import { CreateClientBody } from "../schemas/createClientSchema";
+import { GetClientParams } from "../schemas/getClientParamsSchema";
 
 import {
   CreatedClientResponse,
   GetClientQuery,
   GetAllClientsResponse,
+  GetClientByIdResponse,
 } from "../types/client";
 
 const createNewClient = async (
@@ -48,4 +50,20 @@ const getAllClients = async (
   }
 };
 
-export { createNewClient, getAllClients };
+const getClientById = async (
+  req: Request<GetClientParams>,
+  res: Response<GetClientByIdResponse>,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const client = await adminService.getClientById(id);
+
+    res.status(200).json(client);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { createNewClient, getAllClients, getClientById };
