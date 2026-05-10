@@ -6,6 +6,7 @@ import validateInput from "../middlewares/validateInput";
 
 import { createClientSchema } from "../schemas/createClientSchema";
 import { getClientParamsSchema } from "../schemas/getClientParamsSchema";
+import { updateClientSchema } from "../schemas/updateClientSchema";
 
 const router = Router();
 
@@ -25,5 +26,12 @@ router.get(
   validateInput(getClientParamsSchema, "params"),
   adminController.getClientById,
 );
+
+router.patch(
+  "/clients/:id",
+  validateInput(getClientParamsSchema, "params"),
+  validateInput(updateClientSchema, "body"),
+  adminController.updateClient
+)
 
 export default router;

@@ -4,11 +4,14 @@ import { prisma } from "../lib/prisma";
 import AppError from "../utils/AppError";
 import generateUniqueAccessCode from "../utils/generateUniqueAccessCode";
 
+import { UpdateClientBody } from "../schemas/updateClientSchema";
+
 import {
   CreatedClientResponse,
   GetClientQuery,
   GetAllClientsResponse,
   GetClientByIdResponse,
+  UpdatedClientReponse,
 } from "../types/client";
 
 const createNewClient = async (
@@ -94,4 +97,40 @@ const getClientById = async (id: string): Promise<GetClientByIdResponse> => {
   return client;
 };
 
-export { createNewClient, getAllClients, getClientById };
+const updateClient = async (
+  data: UpdateClientBody,
+  id: string,
+): Promise<UpdatedClientReponse> => {
+  const client = await prisma.client.findUnique({ where: { id } });
+
+  if (!client) {
+    throw new AppError("Client not found", 404);
+  }
+
+  if (!client.isActive) {
+    throw new AppError("Cannot update an inactive client", 409);
+  }
+
+  const updateData = Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined),
+  );
+
+  if (updateData.cpf) {
+    const cpfExists = await prisma.client.findFirst({
+      where: { cpf: updateData.cpf },
+    });
+
+    if (cpfExists) {
+      throw new AppError("CPF already in use", 400);
+    }
+  }
+
+  const updatedClient = await prisma.client.update({
+    where: { id },
+    data: updateData,
+  });
+
+  return updatedClient;
+};
+
+export { createNewClient, getAllClients, getClientById, updateClient };

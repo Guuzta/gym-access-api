@@ -33,3 +33,5 @@ export type GetAllClientsResponse = {
 };
 
 export type GetClientByIdResponse = Client;
+
+export type UpdatedClientReponse = Client;

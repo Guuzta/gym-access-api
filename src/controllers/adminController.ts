@@ -4,12 +4,14 @@ import * as adminService from "../services/adminService";
 
 import { CreateClientBody } from "../schemas/createClientSchema";
 import { GetClientParams } from "../schemas/getClientParamsSchema";
+import { UpdateClientBody } from "../schemas/updateClientSchema";
 
 import {
   CreatedClientResponse,
   GetClientQuery,
   GetAllClientsResponse,
   GetClientByIdResponse,
+  UpdatedClientReponse,
 } from "../types/client";
 
 const createNewClient = async (
@@ -66,4 +68,20 @@ const getClientById = async (
   }
 };
 
-export { createNewClient, getAllClients, getClientById };
+const updateClient = async (
+  req: Request<GetClientParams, {}, UpdateClientBody>,
+  res: Response<UpdatedClientReponse>,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const updatedClient = await adminService.updateClient(req.body, id);
+
+    res.status(200).json(updatedClient);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { createNewClient, getAllClients, getClientById, updateClient };
