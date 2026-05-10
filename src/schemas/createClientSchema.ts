@@ -28,9 +28,17 @@ function isValidCPF(cpf: string): boolean {
 }
 
 export const createClientSchema = z.object({
-  firstName: z.string().min(4, "First name must have at least 4 characteres"),
-  lastName: z.string().min(4, "Second name must have at least 4 characteres"),
-  cpf: z.string().refine(isValidCPF, {
+  firstName: z
+    .string()
+    .min(4, "First name must have at least 4 characteres")
+    .trim()
+    .transform((value) => value.toLowerCase()),
+  lastName: z
+    .string()
+    .min(4, "Second name must have at least 4 characteres")
+    .trim()
+    .transform((value) => value.toLowerCase()),
+  cpf: z.string().trim().refine(isValidCPF, {
     message: "Invalid CPF",
   }),
 });
