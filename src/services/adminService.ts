@@ -133,4 +133,31 @@ const updateClient = async (
   return updatedClient;
 };
 
-export { createNewClient, getAllClients, getClientById, updateClient };
+const deactivateClient = async (id: string): Promise<{ message: string }> => {
+  const client = await prisma.client.findUnique({ where: { id } });
+
+  if (!client) {
+    throw new AppError("Client not found", 404);
+  }
+
+  if (!client.isActive) {
+    throw new AppError("Client is already inactive", 403);
+  }
+
+  await prisma.client.update({
+    where: { id },
+    data: { isActive: false },
+  });
+
+  return {
+    message: "Client deactivated successfully",
+  };
+};
+
+export {
+  createNewClient,
+  getAllClients,
+  getClientById,
+  updateClient,
+  deactivateClient,
+};

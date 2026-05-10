@@ -34,4 +34,10 @@ router.patch(
   adminController.updateClient
 )
 
+router.patch(
+  "/clients/:id/deactivate",
+  validateInput(getClientParamsSchema, "params"),
+  adminController.deactivateClient
+)
+
 export default router;

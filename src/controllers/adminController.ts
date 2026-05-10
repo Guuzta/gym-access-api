@@ -84,4 +84,26 @@ const updateClient = async (
   }
 };
 
-export { createNewClient, getAllClients, getClientById, updateClient };
+const deactivateClient = async (
+  req: Request<GetClientParams>,
+  res: Response<{ message: string }>,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const message = await adminService.deactivateClient(id);
+
+    res.status(200).json(message);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export {
+  createNewClient,
+  getAllClients,
+  getClientById,
+  updateClient,
+  deactivateClient,
+};
