@@ -40,4 +40,10 @@ router.patch(
   adminController.deactivateClient
 )
 
+router.patch(
+  "/clients/:id/activate",
+  validateInput(getClientParamsSchema, "params"),
+  adminController.activateClient
+)
+
 export default router;

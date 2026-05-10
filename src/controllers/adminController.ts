@@ -100,10 +100,27 @@ const deactivateClient = async (
   }
 };
 
+const activateClient = async (
+  req: Request<GetClientParams>,
+  res: Response<{ message: string }>,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const message = await adminService.activateClient(id);
+
+    res.status(200).json(message);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   createNewClient,
   getAllClients,
   getClientById,
   updateClient,
   deactivateClient,
+  activateClient
 };
