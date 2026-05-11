@@ -19,4 +19,8 @@ function getEnv(key: string): string {
 export const env = {
   PORT: Number(getEnv("PORT")),
   DATABASE_URL: getEnv("DATABASE_URL"),
+  TOKEN_SECRET: getEnv("TOKEN_SECRET"),
+  TOKEN_EXPIRATION: getEnv("TOKEN_EXPIRATION"),
+  ADMIN_EMAIL: getEnv("ADMIN_EMAIL"),
+  ADMIN_PASSWORD: getEnv("ADMIN_PASSWORD"),
 };
