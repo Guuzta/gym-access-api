@@ -122,5 +122,5 @@ export {
   getClientById,
   updateClient,
   deactivateClient,
-  activateClient
+  activateClient,
 };

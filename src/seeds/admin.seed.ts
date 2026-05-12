@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma";
 import { env } from "../config/env";
 
-import * as password from "../utils/password";
+import * as passwordHash from "../utils/password";
 
 async function createAdmin() {
   const adminExists = await prisma.user.findFirst({
@@ -13,7 +13,7 @@ async function createAdmin() {
     return;
   }
 
-  const hashedPassword = await password.hash(env.ADMIN_PASSWORD);
+  const hashedPassword = await passwordHash.hash(env.ADMIN_PASSWORD);
 
   await prisma.user.create({
     data: {
