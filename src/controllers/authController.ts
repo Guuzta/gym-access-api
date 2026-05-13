@@ -4,11 +4,11 @@ import * as authService from "../services/authService";
 
 import { LoginUserBody } from "../schemas/loginSchema";
 
-import { Token } from "../types/jwt";
+import { Tokens } from "../types/jwt";
 
 const login = async (
   req: Request<{}, {}, LoginUserBody>,
-  res: Response<Token>,
+  res: Response<Tokens>,
   next: NextFunction,
 ): Promise<void> => {
   try {

@@ -1,14 +1,14 @@
 import { prisma } from "../lib/prisma";
 
 import * as passwordHash from "../utils/password";
+import * as token from "../utils/token";
 import AppError from "../utils/AppError";
-import { generateAccessToken } from "../utils/generateAccessToken";
 
 import { LoginUserBody } from "../schemas/loginSchema";
 
-import { Token } from "../types/jwt";
+import { Tokens } from "../types/jwt";
 
-const login = async (data: LoginUserBody): Promise<Token> => {
+const login = async (data: LoginUserBody): Promise<Tokens> => {
   const { email, password } = data;
 
   const user = await prisma.user.findUnique({ where: { email } });
@@ -23,10 +23,21 @@ const login = async (data: LoginUserBody): Promise<Token> => {
     throw new AppError("Invalid email or password", 401);
   }
 
-  const token = generateAccessToken({ sub: user.id, name: user.name, email });
+  const accessToken = token.generateAccessToken({
+    sub: user.id,
+    name: user.name,
+    email,
+  });
+
+  const refreshToken = token.generateRefreshToken({
+    sub: user.id,
+    name: user.name,
+    email,
+  });
 
   return {
-    token,
+    accessToken,
+    refreshToken,
   };
 };
 

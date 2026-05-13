@@ -4,6 +4,7 @@ export type JwtPayload = {
   email: string;
 };
 
-export type Token = {
-  token: string;
+export type Tokens = {
+  accessToken: string;
+  refreshToken: string;
 };
