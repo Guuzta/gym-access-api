@@ -40,6 +40,7 @@ const login = async (data: LoginUserBody): Promise<Tokens> => {
     sub: user.id,
     name: user.name,
     email,
+    sessionId: session.id,
   });
 
   return {
