@@ -23,10 +23,17 @@ const login = async (data: LoginUserBody): Promise<Tokens> => {
     throw new AppError("Invalid email or password", 401);
   }
 
+  const session = await prisma.session.create({
+    data: {
+      userId: user.id,
+    },
+  });
+
   const accessToken = token.generateAccessToken({
     sub: user.id,
     name: user.name,
     email,
+    sessionId: session.id,
   });
 
   const refreshToken = token.generateRefreshToken({
