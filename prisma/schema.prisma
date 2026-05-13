@@ -29,9 +29,18 @@ model Client {
 }
 
 model User {
-  id       String @id @default(uuid())
+  id       String    @id @default(uuid())
   name     String
-  email    String @unique
+  email    String    @unique
   password String
-  role     Role   @default(USER)
+  role     Role      @default(USER)
+  sessions Session[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

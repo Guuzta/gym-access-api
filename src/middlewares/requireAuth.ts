@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { prisma } from "../lib/prisma";
 import jwt from "jsonwebtoken";
 
 import AppError from "../utils/AppError";
@@ -18,10 +19,18 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const payload = jwt.verify(token, env.TOKEN_SECRET) as JwtPayload;
 
+    const session = await prisma.session.findUnique({
+      where: { id: payload.sessionId },
+    });
+
+    if (!session) {
+      return next(new AppError("Invalid session", 401));
+    }
+
     req.user = payload;
 
     next();
-  } catch {
+  } catch (err) {
     throw new AppError("Invalid token or expired", 403);
   }
 };
