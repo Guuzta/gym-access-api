@@ -3,6 +3,7 @@ import { Router } from "express";
 import * as authController from "../controllers/authController";
 
 import validateInput from "../middlewares/validateInput";
+import requireAuth from "../middlewares/requireAuth";
 
 import { loginUserSchema } from "../schemas/loginSchema";
 
@@ -13,5 +14,11 @@ router.post(
   validateInput(loginUserSchema, "body"),
   authController.login,
 );
+
+router.post(
+  "/logout",
+  requireAuth,
+  authController.logout
+)
 
 export default router;

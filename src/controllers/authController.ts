@@ -6,7 +6,7 @@ import { setRefreshTokenCookie } from "../utils/setRefreshTokenCookie";
 
 import { LoginUserBody } from "../schemas/loginSchema";
 
-import { Tokens } from "../types/jwt";
+import { JwtPayload, Tokens } from "../types/jwt";
 
 const login = async (
   req: Request<{}, {}, LoginUserBody>,
@@ -24,4 +24,22 @@ const login = async (
   }
 };
 
-export { login };
+const logout = async (
+  req: Request,
+  res: Response<{ message: string }>,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { sessionId } = req.user as JwtPayload;
+
+    const message = await authService.logout(sessionId);
+
+    res.clearCookie("refreshToken");
+
+    res.status(200).json(message);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { login, logout };
