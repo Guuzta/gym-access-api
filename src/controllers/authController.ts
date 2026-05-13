@@ -42,4 +42,18 @@ const logout = async (
   }
 };
 
-export { login, logout };
+const refresh = async (
+  req: Request,
+  res: Response<{ accessToken: string }>,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const accessToken = await authService.refresh(req);
+
+    res.status(200).json(accessToken);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { login, logout, refresh };

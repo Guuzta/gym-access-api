@@ -16,9 +16,14 @@ router.post(
 );
 
 router.post(
-  "/logout",
-  requireAuth,
+  "/logout", 
+  requireAuth, 
   authController.logout
-)
+);
+
+router.post(
+  "/refresh", 
+  authController.refresh
+);
 
 export default router;
