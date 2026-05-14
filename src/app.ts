@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import healthRoutes from "./routes/healthRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import authRoutes from "./routes/authRoutes";
+import accessRoutes from "./routes/accessRoutes";
 
 import errorHandler from "./middlewares/errorHandler";
 
@@ -14,6 +15,7 @@ app.use(cookieParser());
 app.use("/", healthRoutes);
 app.use("/admin", adminRoutes);
 app.use("/auth", authRoutes);
+app.use("/access", accessRoutes);
 
 app.use(errorHandler);
 
