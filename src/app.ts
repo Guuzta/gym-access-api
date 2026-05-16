@@ -1,12 +1,12 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 
-import healthRoutes from "./routes/healthRoutes";
-import adminRoutes from "./routes/adminRoutes";
-import authRoutes from "./routes/authRoutes";
-import accessRoutes from "./routes/accessRoutes";
+import healthRoutes from "./routes/healthRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import accessRoutes from "./routes/accessRoutes.js";
 
-import errorHandler from "./middlewares/errorHandler";
+import errorHandler from "./middlewares/errorHandler.js";
 
 const app = express();
 

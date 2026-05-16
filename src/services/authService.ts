@@ -1,14 +1,14 @@
 import { Request } from "express";
 
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 
-import * as passwordHash from "../utils/password";
-import * as token from "../utils/token";
-import AppError from "../utils/AppError";
+import * as passwordHash from "../utils/password.js";
+import * as token from "../utils/token.js";
+import AppError from "../utils/AppError.js";
 
-import { LoginUserBody } from "../schemas/loginSchema";
+import { LoginUserBody } from "../schemas/loginSchema.js";
 
-import { Tokens, JwtPayload } from "../types/jwt";
+import { Tokens, JwtPayload } from "../types/jwt.js";
 
 const login = async (data: LoginUserBody): Promise<Tokens> => {
   const { email, password } = data;

@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 
-import * as authService from "../services/authService";
+import * as authService from "../services/authService.js";
 
-import { setRefreshTokenCookie } from "../utils/setRefreshTokenCookie";
+import { setRefreshTokenCookie } from "../utils/setRefreshTokenCookie.js";
 
-import { LoginUserBody } from "../schemas/loginSchema";
+import { LoginUserBody } from "../schemas/loginSchema.js";
 
-import { JwtPayload, Tokens } from "../types/jwt";
+import { JwtPayload, Tokens } from "../types/jwt.js";
 
 const login = async (
   req: Request<{}, {}, LoginUserBody>,

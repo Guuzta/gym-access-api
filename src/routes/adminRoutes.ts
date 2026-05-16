@@ -1,13 +1,13 @@
 import { Router } from "express";
 
-import * as adminController from "../controllers/adminController";
+import * as adminController from "../controllers/adminController.js";
 
-import validateInput from "../middlewares/validateInput";
-import requireAuth from "../middlewares/requireAuth";
+import validateInput from "../middlewares/validateInput.js";
+import requireAuth from "../middlewares/requireAuth.js";
 
-import { createClientSchema } from "../schemas/createClientSchema";
-import { getClientParamsSchema } from "../schemas/getClientParamsSchema";
-import { updateClientSchema } from "../schemas/updateClientSchema";
+import { createClientSchema } from "../schemas/createClientSchema.js";
+import { getClientParamsSchema } from "../schemas/getClientParamsSchema.js";
+import { updateClientSchema } from "../schemas/updateClientSchema.js";
 
 const router = Router();
 

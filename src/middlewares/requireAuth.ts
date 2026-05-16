@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 import jwt from "jsonwebtoken";
 
-import AppError from "../utils/AppError";
-import { env } from "../config/env";
+import AppError from "../utils/AppError.js";
+import { env } from "../config/env.js";
 
-import { JwtPayload } from "../types/jwt";
+import { JwtPayload } from "../types/jwt.js";
 
 const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;

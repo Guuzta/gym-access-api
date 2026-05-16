@@ -1,10 +1,10 @@
 import { Router } from "express";
 
-import * as accessController from "../controllers/accessController";
+import * as accessController from "../controllers/accessController.js";
 
-import validateInput from "../middlewares/validateInput";
+import validateInput from "../middlewares/validateInput.js";
 
-import { accessSchema } from "../schemas/accessSchema";
+import { accessSchema } from "../schemas/accessSchema.js";
 
 const router = Router();
 

@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 
-import * as adminService from "../services/adminService";
+import * as adminService from "../services/adminService.js";
 
-import { CreateClientBody } from "../schemas/createClientSchema";
-import { GetClientParams } from "../schemas/getClientParamsSchema";
-import { UpdateClientBody } from "../schemas/updateClientSchema";
+import { CreateClientBody } from "../schemas/createClientSchema.js";
+import { GetClientParams } from "../schemas/getClientParamsSchema.js";
+import { UpdateClientBody } from "../schemas/updateClientSchema.js";
 
 import {
   CreatedClientResponse,
@@ -12,7 +12,7 @@ import {
   GetAllClientsResponse,
   GetClientByIdResponse,
   UpdatedClientReponse,
-} from "../types/client";
+} from "../types/client.js";
 
 const createNewClient = async (
   req: Request<{}, {}, CreateClientBody>,

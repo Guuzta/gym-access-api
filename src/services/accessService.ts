@@ -1,8 +1,8 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 
-import AppError from "../utils/AppError";
+import AppError from "../utils/AppError.js";
 
-import { AccessResponse } from "../types/access";
+import { AccessResponse } from "../types/access.js";
 
 const validateAccessCode = async (
   accessCode: string,

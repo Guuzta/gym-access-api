@@ -1,10 +1,10 @@
-import type { Prisma } from "../generated/prisma/client";
-import { prisma } from "../lib/prisma";
+import type { Prisma } from "../generated/prisma/client.js";
+import { prisma } from "../lib/prisma.js";
 
-import AppError from "../utils/AppError";
-import generateUniqueAccessCode from "../utils/generateUniqueAccessCode";
+import AppError from "../utils/AppError.js";
+import generateUniqueAccessCode from "../utils/generateUniqueAccessCode.js";
 
-import { UpdateClientBody } from "../schemas/updateClientSchema";
+import { UpdateClientBody } from "../schemas/updateClientSchema.js";
 
 import {
   CreatedClientResponse,
@@ -12,7 +12,7 @@ import {
   GetAllClientsResponse,
   GetClientByIdResponse,
   UpdatedClientReponse,
-} from "../types/client";
+} from "../types/client.js";
 
 const createNewClient = async (
   firstName: string,
