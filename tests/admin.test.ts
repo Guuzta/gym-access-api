@@ -1,0 +1,167 @@
+import request from "supertest";
+import jwt from "jsonwebtoken";
+
+import app from "../src/app";
+import { env } from "../src/config/env";
+
+import getAdminToken from "./helpers/getAdminToken";
+
+describe("Admin", () => {
+  describe("POST /admin/clients", () => {
+    it("should create a client", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          firstName: "João",
+          lastName: "Silva",
+          cpf: "94279968039",
+        });
+
+      expect(res.statusCode).toBe(201);
+
+      expect(res.body).toEqual({
+        id: expect.any(String),
+        firstName: expect.any(String),
+        lastName: expect.any(String),
+        accessCode: expect.any(String),
+      });
+    });
+
+    it("should return 400 when firstName has less than 4 characters", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          firstName: "Joã",
+          lastName: "Silva",
+          cpf: "94279968039",
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty("errors");
+    });
+
+    it("should return 400 when lastName has less than 4 characters", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          firstName: "João",
+          lastName: "Si",
+          cpf: "94279968039",
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty("errors");
+    });
+
+    it("should return 400 when CPF is invalid", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          firstName: "João",
+          lastName: "Silva",
+          cpf: "00000000000",
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty("errors");
+    });
+
+    it("should return 400 when CPF is already in use", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          firstName: "João",
+          lastName: "Silva",
+          cpf: "94279968039",
+        });
+
+      const res = await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          firstName: "Maria",
+          lastName: "Tereza",
+          cpf: "94279968039",
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 400 when the required fields are missing", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({});
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty("errors");
+    });
+
+    it("should return 401 when the session has already been invalidated", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      await request(app)
+        .post("/auth/logout")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      const res = await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          firstName: "João",
+          lastName: "Silva",
+          cpf: "94279968039",
+        });
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 if accessToken is missing", async () => {
+      const res = await request(app).post("/admin/clients").send({
+        firstName: "João",
+        lastName: "Silva",
+        cpf: "94279968039",
+      });
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 403 if accessToken is expired", async () => {
+      const expiredToken = jwt.sign({ sub: "user-id" }, env.TOKEN_SECRET, {
+        expiresIn: "-1h",
+      });
+
+      const res = await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${expiredToken}`)
+        .send({
+          firstName: "João",
+          lastName: "Silva",
+          cpf: "94279968039",
+        });
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body).toHaveProperty("message");
+    });
+  });
+});

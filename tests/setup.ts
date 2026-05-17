@@ -5,6 +5,7 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
+  await prisma.client.deleteMany();
   await prisma.session.deleteMany();
   await prisma.user.deleteMany();
 });
