@@ -1,6 +1,7 @@
 //// <reference types="jest" />
 
 import request from "supertest";
+import jwt from "jsonwebtoken";
 
 import app from "../src/app";
 import { env } from "../src/config/env";
@@ -143,6 +144,77 @@ describe("Auth", () => {
         .set("Authorization", `Bearer invalidToken`);
 
       expect(res.statusCode).toBe(403);
+      expect(res.body).toHaveProperty("message");
+    });
+  });
+
+  describe("POST /auth/refresh", () => {
+    it("should generate a new accessToken using a refreshToken", async () => {
+      await createAdmin();
+
+      const agent = request.agent(app);
+
+      await agent.post("/auth/login").send({
+        email: env.ADMIN_EMAIL,
+        password: env.ADMIN_PASSWORD,
+      });
+
+      const res = await agent.post("/auth/refresh");
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toHaveProperty("accessToken");
+    });
+
+    it("should return 401 if refreshToken is missing", async () => {
+      const res = await request(app).post("/auth/refresh");
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 when refreshToken is invalid", async () => {
+      const res = await request(app)
+        .post("/auth/refresh")
+        .set("Cookie", ["refreshToken=invalid-token"]);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 when refreshToken is expired", async () => {
+      const expiredToken = jwt.sign(
+        { sub: "user-id" },
+        env.REFRESH_TOKEN_SECRET,
+        {
+          expiresIn: "-1h",
+        },
+      );
+
+      const res = await request(app)
+        .post("/auth/refresh")
+        .set("Cookie", [`refreshToken=${expiredToken}`]);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 when the session has already been invalidated", async () => {
+      await createAdmin();
+
+      const agent = request.agent(app);
+
+      const loginResponse = await agent.post("/auth/login").send({
+        email: env.ADMIN_EMAIL,
+        password: env.ADMIN_PASSWORD,
+      });
+
+      await agent
+        .post("/auth/logout")
+        .set("Authorization", `Bearer ${loginResponse.body.accessToken}`);
+
+      const res = await agent.post("/auth/refresh");
+
+      expect(res.statusCode).toBe(401);
       expect(res.body).toHaveProperty("message");
     });
   });
