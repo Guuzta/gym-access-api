@@ -6,6 +6,7 @@ import app from "../src/app";
 import { env } from "../src/config/env";
 
 import createAdmin from "./helpers/createAdmin";
+import getAdminToken from "./helpers/getAdminToken";
 
 describe("Auth", () => {
   describe("POST /auth/login", () => {
@@ -98,6 +99,50 @@ describe("Auth", () => {
       });
 
       expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+  });
+
+  describe("POST /auth/logout", () => {
+    it("should logout a user", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .post("/auth/logout")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 when the session has already been invalidated", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      await request(app)
+        .post("/auth/logout")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      const res = await request(app)
+        .post("/auth/logout")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 if no token is provided", async () => {
+      const res = await request(app).post("/auth/logout");
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 403 if token is invalid or expired", async () => {
+      const res = await request(app)
+        .post("/auth/logout")
+        .set("Authorization", `Bearer invalidToken`);
+
+      expect(res.statusCode).toBe(403);
       expect(res.body).toHaveProperty("message");
     });
   });
