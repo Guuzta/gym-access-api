@@ -3,8 +3,10 @@ import jwt from "jsonwebtoken";
 
 import app from "../src/app";
 import { env } from "../src/config/env";
+import { prisma } from "../src/lib/prisma";
 
 import getAdminToken from "./helpers/getAdminToken";
+import createClient from "../tests/helpers/createClient";
 
 describe("Admin", () => {
   describe("POST /admin/clients", () => {
@@ -159,6 +161,147 @@ describe("Admin", () => {
           lastName: "Silva",
           cpf: "94279968039",
         });
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body).toHaveProperty("message");
+    });
+  });
+
+  describe("GET /admin/clients", () => {
+    beforeEach(async () => {
+      await prisma.client.createMany({
+        data: [
+          await createClient("gustavo", "silva", "98157250099", false),
+          await createClient("joão", "silva", "95915964052", true),
+          await createClient("joão", "ferreira", "55498739079", true),
+          await createClient("maria", "rosa", "53308062089", false),
+        ],
+      });
+    });
+
+    it("should return a list of clients", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .get("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body).toHaveProperty("data");
+      expect(res.statusCode).toBe(200);
+
+      const clientBody = res.body.data[0];
+
+      expect(clientBody).toMatchObject({
+        id: expect.any(String),
+        firstName: expect.any(String),
+        lastName: expect.any(String),
+        accessCode: expect.any(String),
+        cpf: expect.any(String),
+        isActive: expect.any(Boolean),
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+      });
+    });
+
+    it("should filtered clients by firstName", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .get("/admin/clients")
+        .query({ firstName: "joão" })
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body).toHaveProperty("data");
+      expect(res.statusCode).toBe(200);
+
+      res.body.data.forEach((customer: any) => {
+        expect(customer.firstName).toBe("joão");
+      });
+    });
+
+    it("should filtered clients by isActive=true", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .get("/admin/clients")
+        .query({ isActive: true })
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body).toHaveProperty("data");
+      expect(res.statusCode).toBe(200);
+
+      res.body.data.forEach((customer: any) => {
+        expect(customer.isActive).toBe(true);
+      });
+    });
+
+    it("should filtered clients by isActive=false", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .get("/admin/clients")
+        .query({ isActive: false })
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body).toHaveProperty("data");
+      expect(res.statusCode).toBe(200);
+
+      res.body.data.forEach((customer: any) => {
+        expect(customer.isActive).toBe(false);
+      });
+    });
+
+    it("should filtered clients by cpf", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .get("/admin/clients")
+        .query({ cpf: "98157250099" })
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body).toHaveProperty("data");
+      expect(res.statusCode).toBe(200);
+
+      res.body.data.forEach((customer: any) => {
+        expect(customer.cpf).toBe("98157250099");
+      });
+    });
+
+    it("should return 401 when the session has already been invalidated", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      await request(app)
+        .post("/auth/logout")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      const res = await request(app)
+        .get("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 if accessToken is missing", async () => {
+      const res = await request(app).get("/admin/clients");
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 403 if accessToken is expired", async () => {
+      const expiredToken = jwt.sign({ sub: "user-id" }, env.TOKEN_SECRET, {
+        expiresIn: "-1h",
+      });
+
+      const res = await request(app)
+        .get("/admin/clients")
+        .set("Authorization", `Bearer ${expiredToken}`);
 
       expect(res.statusCode).toBe(403);
       expect(res.body).toHaveProperty("message");
