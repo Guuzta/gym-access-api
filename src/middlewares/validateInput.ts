@@ -18,6 +18,13 @@ export default function validateInput(
         }),
       );
 
+      if (flat.formErrors.length > 0) {
+        errors.push({
+          field: "body",
+          message: flat.formErrors[0],
+        });
+      }
+
       return res.status(400).json({
         errors,
       });
