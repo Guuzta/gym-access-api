@@ -27,25 +27,29 @@ function isValidCPF(cpf: string): boolean {
   return remainder === parseInt(cpf[10]);
 }
 
-export const updateClientSchema = z.object({
-  firstName: z
-    .string()
-    .min(4, "First name must have at least 4 characteres")
-    .trim()
-    .transform((value) => value.toLowerCase())
-    .optional(),
-  lastName: z
-    .string()
-    .min(4, "Last name must have at least 4 characteres")
-    .trim()
-    .transform((value) => value.toLowerCase())
-    .optional(),
-  cpf: z
-    .string()
-    .refine(isValidCPF, {
-      message: "Invalid CPF",
-    })
-    .optional(),
-});
+export const updateClientSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(4, "First name must have at least 4 characteres")
+      .trim()
+      .transform((value) => value.toLowerCase())
+      .optional(),
+    lastName: z
+      .string()
+      .min(4, "Last name must have at least 4 characteres")
+      .trim()
+      .transform((value) => value.toLowerCase())
+      .optional(),
+    cpf: z
+      .string()
+      .refine(isValidCPF, {
+        message: "Invalid CPF",
+      })
+      .optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  });
 
 export type UpdateClientBody = z.infer<typeof updateClientSchema>;
