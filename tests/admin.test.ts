@@ -610,4 +610,100 @@ describe("Admin", () => {
       expect(res.body).toHaveProperty("message");
     });
   });
+
+  describe("PATCH /admin/clients/:id/deactivate", () => {
+    it("should deactivate a client", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const { id: clientId } = await prisma.client.create({
+        data: await createClient("joão", "silva", "94279968039", true),
+      });
+
+      const res = await request(app)
+        .patch(`/admin/clients/${clientId}/deactivate`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      const updatedClient = await prisma.client.findUnique({
+        where: { id: clientId },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(updatedClient!.isActive).toBe(false);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 400 when route param id is not a valid UUID", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .patch("/admin/clients/invalidId/deactivate")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty("errors");
+    });
+
+    it("should return 404 if client does not exist", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .patch("/admin/clients/ef5d81e9-f54e-453d-93e6-4116d1f70617/deactivate")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 403 if client is already inactive", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const { id: clientId } = await prisma.client.create({
+        data: await createClient("joão", "silva", "94279968039", false),
+      });
+
+      const res = await request(app)
+        .patch(`/admin/clients/${clientId}/deactivate`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 when the session has already been invalidated", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      await request(app)
+        .post("/auth/logout")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      const res = await request(app)
+        .patch("/admin/clients/ef5d81e9-f54e-453d-93e6-4116d1f70617/deactivate")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 if accessToken is missing", async () => {
+      const res = await request(app).patch(
+        "/admin/clients/ef5d81e9-f54e-453d-93e6-4116d1f70617/deactivate",
+      );
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 403 if accessToken is expired", async () => {
+      const expiredToken = jwt.sign({ sub: "user-id" }, env.TOKEN_SECRET, {
+        expiresIn: "-1h",
+      });
+
+      const res = await request(app)
+        .patch("/admin/clients/ef5d81e9-f54e-453d-93e6-4116d1f70617/deactivate")
+        .set("Authorization", `Bearer ${expiredToken}`);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body).toHaveProperty("message");
+    });
+  });
 });
