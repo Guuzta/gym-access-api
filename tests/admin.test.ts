@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+
 import request from "supertest";
 import jwt from "jsonwebtoken";
 
@@ -301,6 +303,108 @@ describe("Admin", () => {
 
       const res = await request(app)
         .get("/admin/clients")
+        .set("Authorization", `Bearer ${expiredToken}`);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body).toHaveProperty("message");
+    });
+  });
+
+  describe("GET /admin/clients/:id", () => {
+    it("should return a client by id", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const clientResponse = await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          firstName: "João",
+          lastName: "Silva",
+          cpf: "94279968039",
+        });
+
+      const clientId = clientResponse.body.id;
+
+      const res = await request(app)
+        .get(`/admin/clients/${clientId}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toMatchObject({
+        id: expect.any(String),
+        firstName: expect.any(String),
+        lastName: expect.any(String),
+        accessCode: expect.any(String),
+        isActive: expect.any(Boolean),
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+      });
+    });
+
+    it("should return 400 when route param id is not a valid UUID", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .get("/admin/clients/invalidId")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty("errors");
+    });
+
+    it("should return 404 if client does not exist", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const res = await request(app)
+        .get("/admin/clients/ef5d81e9-f54e-453d-93e6-4116d1f70617")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 when the session has already been invalidated", async () => {
+      const { accessToken } = await getAdminToken(app);
+
+      const clientResponse = await request(app)
+        .post("/admin/clients")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          firstName: "João",
+          lastName: "Silva",
+          cpf: "94279968039",
+        });
+
+      const clientId = clientResponse.body.id;
+
+      await request(app)
+        .post("/auth/logout")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      const res = await request(app)
+        .get(`/admin/clients/${clientId}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 401 if accessToken is missing", async () => {
+      const res = await request(app).get(
+        "/admin/clients/ef5d81e9-f54e-453d-93e6-4116d1f70617",
+      );
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty("message");
+    });
+
+    it("should return 403 if accessToken is expired", async () => {
+      const expiredToken = jwt.sign({ sub: "user-id" }, env.TOKEN_SECRET, {
+        expiresIn: "-1h",
+      });
+
+      const res = await request(app)
+        .get("/admin/clients/ef5d81e9-f54e-453d-93e6-4116d1f70617")
         .set("Authorization", `Bearer ${expiredToken}`);
 
       expect(res.statusCode).toBe(403);
