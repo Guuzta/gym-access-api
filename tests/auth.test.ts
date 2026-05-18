@@ -1,4 +1,4 @@
-//// <reference types="jest" />
+/// <reference types="jest" />
 
 import request from "supertest";
 import jwt from "jsonwebtoken";
@@ -181,7 +181,7 @@ describe("Auth", () => {
       expect(res.body).toHaveProperty("message");
     });
 
-    it("should return 401 when refreshToken is expired", async () => {
+    it("should return 403 when refreshToken is expired", async () => {
       const expiredToken = jwt.sign(
         { sub: "user-id" },
         env.REFRESH_TOKEN_SECRET,
