@@ -1,6 +1,6 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 
-import AppError from "./AppError";
+import AppError from "./AppError.js";
 
 export default async function generateUniqueAccessCode(): Promise<string> {
   const MAX_ATTEMPTS = 10;

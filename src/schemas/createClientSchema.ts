@@ -35,7 +35,7 @@ export const createClientSchema = z.object({
     .transform((value) => value.toLowerCase()),
   lastName: z
     .string()
-    .min(4, "Second name must have at least 4 characteres")
+    .min(4, "Last name must have at least 4 characteres")
     .trim()
     .transform((value) => value.toLowerCase()),
   cpf: z.string().trim().refine(isValidCPF, {
