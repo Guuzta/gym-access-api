@@ -1,0 +1,7 @@
+dist/
+node_modules
+tests/
+.gitignore
+.prettierignore
+jest.config.ts
+.env**
