@@ -4,7 +4,7 @@ services:
     restart: always
     depends_on:
       - postgres
-    environment:
+    env_file:
       - .env.production
     expose:
       - "3000"
