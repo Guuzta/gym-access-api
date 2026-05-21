@@ -31,5 +31,5 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             docker pull guuzta/gym-access-api:latest
-            docker compose -f /app/docker-compose.yml up -d
+            docker compose -f app/docker-compose.yml up -d
             docker compose exec api npx prisma migrate deploy
