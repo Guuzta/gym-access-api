@@ -32,7 +32,7 @@ jobs:
       REFRESH_TOKEN_EXPIRATION: ${{ secrets.REFRESH_TOKEN_EXPIRATION}}
 
       ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL}}
-      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWOR}}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD}}
 
     steps:
       - name: Checkout code
