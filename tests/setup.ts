@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+
 import { prisma } from "../src/lib/prisma";
 
 beforeAll(async () => {
