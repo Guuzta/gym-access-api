@@ -1,6 +1,6 @@
 services:
   api:
-    image: gym-access-api:latest
+    image: guuzta/gym-access-api:latest
     restart: always
     depends_on:
       - postgres
